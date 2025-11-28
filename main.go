@@ -5,13 +5,21 @@ package main
 
 import (
 	"log"
+	"net/http"
 	"os"
 
-	"github.com/dfodeker/clover/cmd"
-	"github.com/dfodeker/clover/config"
 	"github.com/dfodeker/clover/database"
 	"github.com/joho/godotenv"
 )
+
+type apiConfig struct {
+	db           database.Client
+	jwtSecret    string
+	platform     string
+	filepathRoot string
+	assetsRoot   string
+	port         string
+}
 
 func main() {
 	godotenv.Load(".env")
@@ -37,17 +45,35 @@ func main() {
 	if assetsRoot == "" {
 		log.Fatal("ASSETS_ROOT environment variable is not set")
 	}
+	filepathRoot := os.Getenv("FILEPATH_ROOT")
+	if assetsRoot == "" {
+		log.Fatal("ASSETS_ROOT environment variable is not set")
+	}
 	port := os.Getenv("PORT")
 	if port == "" {
 		log.Fatal("PORT environment variable is not set")
 	}
 
-	cfg := config.Config{
-		DB:         db,
-		JwtSecret:  jwtSecret,
-		Platform:   platform,
-		AssetsRoot: assetsRoot,
+	cfg := apiConfig{
+		db:           db,
+		jwtSecret:    jwtSecret,
+		platform:     platform,
+		assetsRoot:   assetsRoot,
+		filepathRoot: filepathRoot,
+		port:         port,
 	}
 
-	cmd.Execute(cfg)
+	mux := http.NewServeMux()
+	appHandler := http.StripPrefix("/app", http.FileServer(http.Dir(filepathRoot)))
+	mux.Handle("/app/", appHandler)
+
+	mux.HandleFunc("POST /api/login", cfg.handlerLogin)
+	//cmd.Execute(cfg)
+	srv := &http.Server{
+		Addr:    ":" + port,
+		Handler: mux,
+	}
+
+	log.Printf("Serving on: http://localhost:%s/app/\n", port)
+	log.Fatal(srv.ListenAndServe())
 }

@@ -26,17 +26,6 @@ func NewClient(pathToDB string) (Client, error) {
 
 }
 
-// type Note struct {
-// 	ID        uuid.UUID `db:"id"         json:"id"`
-// 	Key       string    `db:"key"        json:"key"`
-// 	Title     string    `db:"title"      json:"title"`
-// 	Body      string    `db:"body"       json:"body"`
-// 	Tags      []string  `db:"-"          json:"tags"` // slice in memory
-// 	CreatedAt time.Time `db:"created_at" json:"created_at"`
-// 	UpdatedAt time.Time `db:"updated_at" json:"updated_at"`
-// 	Checksum  string    `db:"checksum"   json:"checksum"`
-// }
-
 func (c *Client) autoMigrate() error {
 
 	userTable := `
