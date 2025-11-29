@@ -1,6 +1,6 @@
 # Clover 
-Terminal Based Notes Application
-Clover is a simple terminal-based notes application that allows users to create, view, and manage their notes directly from the command line. It is designed to be lightweight and easy to use, making it perfect for quick note-taking tasks.
+
+Clover is a notes app
 
 ## Features
 - Create, view, edit, and delete notes
